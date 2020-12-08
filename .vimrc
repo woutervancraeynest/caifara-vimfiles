@@ -88,7 +88,7 @@ Plug 'tpope/vim-repeat' " repeat (.) toelaten met vim-surround
 " " Use smartcase.
 inoremap <expr><tab> pumvisible() ? "\<c-n>" : "\<tab>"
 
-
+Plug 'rizzatti/dash.vim'
 Plug 'ternjs/tern_for_vim', { 'do': 'npm install' }
 
 Plug 'vim-ruby/vim-ruby'
