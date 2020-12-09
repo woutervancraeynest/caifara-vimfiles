@@ -1,6 +1,11 @@
 set nocompatible
 " filetype off " voor vundle
 
+" set leader char
+let mapleader = ","
+" let mapleader = "\<Space>"
+let maplocalleader = "-"
+
 call plug#begin('~/.vim/plugged')
 
 Plug 'mileszs/ack.vim' " zoeken: werkt na brew install the_silver_searcher
@@ -58,6 +63,9 @@ Plug 'tpope/vim-haml'
         \   'javascript': ['prettier', 'eslint'],
         \   'javascriptreact': ['prettier']
         \}
+  let g:ale_linters = {
+        \   'ruby': ['rubocop']
+        \}
   let g:ale_javascript_prettier_options = "--no-semi"
   let g:ale_javascript_eslint_options = ''
   let g:ale_ruby_rufo_options = "--filename=~/.rufo"
@@ -65,7 +73,6 @@ Plug 'tpope/vim-haml'
 "  }}}
 
 Plug 'ddollar/nerdcommenter'
-Plug 'scrooloose/nerdtree'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-repeat' " repeat (.) toelaten met vim-surround
 
@@ -77,9 +84,13 @@ Plug 'tpope/vim-repeat' " repeat (.) toelaten met vim-surround
   Plug 'elzr/vim-json'
 " }}}
 
+" icoontjes {{{
+  " Moet vermeld worden NA de plugins die er gebruik van maken
+  Plug 'ryanoasis/vim-devicons'
+" }}}
 
 " Autocomplete {{{
-  Plug 'neoclide/coc.nvim', {'tag': '*', 'do': { -> coc#util#install()}}
+  Plug 'neoclide/coc.nvim', {'branch': 'release'}
   nmap t :call CocAction("doHover")<CR>
   " nmap <leader>f  <Plug>(coc-format-selected) " werkt niet
   nmap <leader>F  <Plug>(coc-format)
@@ -184,7 +195,7 @@ Plug 'mikewest/vimroom'
 " Plug 'honza/vim-snippets'
 
 " voor htmlbook
-Plug 'file:///Users/caifara/Documents/by2.be/open_source/vim-htmlbook'
+" Plug 'file:///Users/caifara/Documents/by2.be/open_source/vim-htmlbook'
 
 " statusbar
 " Plug 'bling/vim-airline'
@@ -216,11 +227,18 @@ Plug 'sotte/presenting.vim'
 " ascii art editor
 " Plug 'gyim/vim-boxdraw'
 
+" filetree {{{
+  Plug 'preservim/nerdtree'
+  let NERDTreeIgnore=['\.pyc$', '\.rbc$', '\~$']
+  map <Leader>n :NERDTreeToggle<CR>
+  let NERDTreeQuitOnOpen=1
+" }}}
+
 call plug#end()
 
 " Airline config
-let g:airline_powerline_fonts = 1
-let g:Powerline_symbols='unicode'
+" let g:airline_powerline_fonts = 1
+" let g:Powerline_symbols='unicode'
 " if !exists('g:airline_symbols')
 "     let g:airline_symbols = {}
 " endif
@@ -239,8 +257,6 @@ let g:Powerline_symbols='unicode'
 " let g:airline_symbols.paste = '∥'
 " let g:airline_symbols.whitespace = 'Ξ'
 
-
-
 set number
 
 " Whitespace stuff
@@ -250,12 +266,6 @@ set shiftwidth=2
 set softtabstop=2
 set expandtab
 set list listchars=tab:\ \ ,trail:·
-
-" Searching
-set hlsearch
-set incsearch
-set ignorecase
-set smartcase
 
 " Tab completion
 set wildmode=list:longest,list:full
@@ -269,11 +279,6 @@ set laststatus=2
 " This is likely a bludgeon to solve some other issue, but it works
 " set noequalalways
 
-" set leader char
-let mapleader = ","
-" let mapleader = "\<Space>"
-let maplocalleader = "-"
-
 " fast save file
 nnoremap <Leader>w :w<CR>
 
@@ -284,11 +289,6 @@ nmap <Leader>p "+p
 nmap <Leader>P "+P
 vmap <Leader>p "+p
 vmap <Leader>P "+P
-
-" NERDTree configuration
-let NERDTreeIgnore=['\.pyc$', '\.rbc$', '\~$']
-map <Leader>n :NERDTreeToggle<CR>
-let NERDTreeQuitOnOpen=1
 
 " ZoomWin configuration
 map <Leader><Leader> :ZoomWin<CR>
@@ -472,20 +472,19 @@ set colorcolumn=80
   let g:no_turbux_mappings = 1 " eigen map gebruiken
   map <leader>S <Plug>SendTestToTmux
   map <leader>s <Plug>SendFocusedTestToTmux
-  let g:tmux_sessionname = "0"
-  let g:tmux_windowname = "tmux"
+  " onderstaande hebben gn effect: alles zit in g:tslime (vb:
+  " g:tslime['window'])
+  " let g:tmux_sessionname = "0"
+  " let g:tmux_windowname = "tmux"
   " let g:tmux_panenumber = "1"
   let g:turbux_command_prefix = ""
   let g:turbux_command_cucumber = 'cucumber --require features'
   vmap <C-c><C-c> <Plug>SendSelectionToTmux
 
   " Indien rspec ingesteld is om de testen te evalueren naar quickfix
-  " kan je quickfix laden met ,q
-  map <leader>q :cg quickfix.out \| cwindow<CR>
+  " kan je quickfix laden met ,r (van rspec)
+  map <leader>r :cg quickfix.out \| cwindow<CR>
 " }}}
-
-set nohls
-
 
 " om crontab edits mogelijk te maken
 
@@ -520,7 +519,7 @@ function Multiple_cursors_after()
 endfunction
 
 " .arb bestanden zijn ruby bestanden
-augroup filetypedetect
+augroup filetypedetecters
   au BufRead,BufNewFile *.arb set filetype=ruby
 augroup END
 
@@ -580,6 +579,12 @@ augroup END
   endfunction
 " }}}
 
+" Visuals -------------------------- {{{
+  " volgende foutmelding houdt bug tegen (oplossing helpt niet bij mij)
+  " https://github.com/wellle/context.vim/issues/32
+  " Plug 'wellle/context.vim'
+" }}}
+
 function! ToggleVerbose()
   if !&verbose
     set verbosefile=~/vim_verbose.log
@@ -590,10 +595,37 @@ function! ToggleVerbose()
   endif
 endfunction
 
-" Firefox integratie {{{
-  " Firefox extensie nodig
-  " https://github.com/glacambre/firenvim
-  Plug 'glacambre/firenvim', { 'do': { _ -> firenvim#install(0) } }
+" Searching and Easymotion {{{
+  set nohls " geen search highlight
+  set incsearch
+  set ignorecase
+  set smartcase
+
+  " Plug 'easymotion/vim-easymotion'
+
+  " let g:EasyMotion_do_mapping = 0 " Disable default mappings
+
+  " " 2 char zoeken
+  " " Jump to anywhere you want with minimal keystrokes, with just one key binding.
+  " " `s{char}{char}{label}`
+  " nmap s <Plug>(easymotion-overwin-f2)
+
+  " " Turn on case-insensitive feature
+  " let g:EasyMotion_smartcase = 1
+
+  " " JK motions: Line motions
+  " map <Leader>j <Plug>(easymotion-j)
+  " map <Leader>k <Plug>(easymotion-k)
+
+  " n char zoeken
+  " map  / <Plug>(easymotion-sn)
+  " omap / <Plug>(easymotion-tn)
+  " let g:EasyMotion_off_screen_search = 1 " Search whole buffer
 " }}}
 
+
 call plug#end()
+
+" gutter had plots verkeerde kleuren
+" https://stackoverflow.com/questions/15277241/changing-vim-gutter-color
+highlight clear SignColumn
